@@ -283,11 +283,40 @@ async function gameScenario(server: TestServer): Promise<void> {
   for (const socket of Object.values(p)) socket.close();
 }
 
+async function ttlScenario(server: TestServer): Promise<void> {
+  const { url, store } = server;
+  const host = await connect(url);
+  let pin = '';
+
+  await step('1. через ~1,5 с і ведучий, і гравець отримують room:closed', async () => {
+    const res = await ask(host).emitWithAck('host:create', { quizId: store.list()[0].id });
+    check(res.ok, JSON.stringify(res));
+    pin = res.pin;
+    const createdAt = Date.now();
+    const { socket } = await joinAs(url, pin, 'Оля');
+    await Promise.all([
+      waitFor(host, 'room:closed', () => true, 3000),
+      waitFor(socket, 'room:closed', () => true, 3000),
+    ]);
+    const took = Date.now() - createdAt;
+    check(took >= 1000 && took <= 2500, `room:closed came after ${took} ms`);
+    socket.close();
+  });
+
+  await step('2. host:join з цим PIN → ROOM_NOT_FOUND', async () => {
+    expectError(await ask(host).emitWithAck('host:join', { pin }), 'ROOM_NOT_FOUND');
+  });
+
+  host.close();
+}
+
 async function main(): Promise<void> {
   console.log('— Лобі');
   await lobbyScenario(await startServer());
   console.log('— Гра');
   await gameScenario(await startServer());
+  console.log('— Час життя кімнати');
+  await ttlScenario(await startServer({ roomTtlMs: 1500 }));
 }
 
 function finish(error?: unknown): void {
