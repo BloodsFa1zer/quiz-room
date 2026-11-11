@@ -1,6 +1,6 @@
 import { isValidPin, type Ack } from '@quiz/shared';
 import type { QuizStore } from '../quiz/quizStore';
-import { disconnectPlayer, joinPlayer } from './engine';
+import { advance, disconnectPlayer, joinPlayer, reveal, shouldAutoReveal, submitAnswer } from './engine';
 import type { RoomManager } from './roomManager';
 import type { QuizServer, QuizSocket, Room } from './types';
 import { buildHostState, buildPlayerState } from './views';
@@ -21,8 +21,25 @@ export function registerSocketHandlers(io: QuizServer, deps: { store: QuizStore;
     }
   }
 
+  /**
+   * Keeps exactly one timer per room, armed only during `question`.
+   * Safe to call after every change: the deadline comes from endsAt instead of being counted again.
+   */
+  function syncTimer(room: Room): void {
+    if (room.timer) clearTimeout(room.timer);
+    room.timer = null;
+    if (room.phase !== 'question' || room.endsAt === null) return;
+    room.timer = setTimeout(() => {
+      room.timer = null;
+      if (room.phase !== 'question') return;
+      reveal(room);
+      afterChange(room);
+    }, Math.max(0, room.endsAt - Date.now()));
+  }
+
   /** The single place to call after ANY change to a room. */
   function afterChange(room: Room): void {
+    syncTimer(room);
     broadcast(room);
   }
 
@@ -75,11 +92,42 @@ export function registerSocketHandlers(io: QuizServer, deps: { store: QuizStore;
       }),
     );
 
+    socket.on(
+      'host:next',
+      safe((_payload, ack) => {
+        const { role, pin } = socket.data;
+        const room = role === 'host' && pin ? rooms.getRoom(pin) : undefined;
+        if (!room) return ack({ ok: false, error: 'NOT_IN_ROOM' });
+        const res = advance(room, Date.now());
+        ack(res);
+        if (res.ok) afterChange(room);
+      }),
+    );
+
+    socket.on(
+      'player:answer',
+      safe((payload, ack) => {
+        const { role, pin, playerId } = socket.data;
+        const room = role === 'player' && pin ? rooms.getRoom(pin) : undefined;
+        if (!room || !playerId) return ack({ ok: false, error: 'NOT_IN_ROOM' });
+        const optionIndex = field(payload, 'optionIndex');
+        if (typeof optionIndex !== 'number') return ack({ ok: false, error: 'BAD_REQUEST' });
+        const res = submitAnswer(room, playerId, optionIndex, Date.now());
+        ack(res);
+        if (!res.ok) return;
+        if (shouldAutoReveal(room)) reveal(room);
+        afterChange(room);
+      }),
+    );
+
     socket.on('disconnect', () => {
       const { role, pin } = socket.data;
       if (role !== 'player' || !pin) return; // A host leaving does not stop the game.
       const room = rooms.getRoom(pin);
-      if (room && disconnectPlayer(room, socket.id)) afterChange(room);
+      if (!room || !disconnectPlayer(room, socket.id)) return;
+      // Otherwise the game would wait for the timer if the last player who had not answered left.
+      if (shouldAutoReveal(room)) reveal(room);
+      afterChange(room);
     });
   });
 }
