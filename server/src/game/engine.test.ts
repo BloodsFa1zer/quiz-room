@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { MAX_PLAYERS, type Quiz } from '@quiz/shared';
-import { createRoomState, disconnectPlayer, joinPlayer } from './engine';
+import {
+  advance,
+  createRoomState,
+  disconnectPlayer,
+  joinPlayer,
+  reveal,
+  shouldAutoReveal,
+  submitAnswer,
+} from './engine';
 import type { Room } from './types';
 
 function makeQuiz(): Quiz {
@@ -163,5 +171,147 @@ describe('disconnectPlayer', () => {
     join(room, 'a', 'Оля', 'new');
     expect(disconnectPlayer(room, 's-a')).toBeNull();
     expect(room.players.get('a')?.socketId).toBe('new');
+  });
+});
+
+/** Room with players a (Оля) and b (Тарас), both connected, still in lobby. */
+function roomWithPlayers(quiz = makeQuiz()): Room {
+  const room = createRoomState('123456', quiz, 1_000);
+  join(room, 'a', 'Оля');
+  join(room, 'b', 'Тарас');
+  return room;
+}
+
+function score(room: Room, id: string): number | undefined {
+  return room.players.get(id)?.score;
+}
+
+describe('advance', () => {
+  it('walks the full path of a 2-question quiz', () => {
+    const room = roomWithPlayers();
+    expect(advance(room, 10_000)).toEqual({ ok: true });
+    expect(room).toMatchObject({ phase: 'question', questionIndex: 0, questionStartedAt: 10_000, endsAt: 20_000 });
+    expect(advance(room, 12_000)).toEqual({ ok: true });
+    expect(room).toMatchObject({ phase: 'reveal', questionIndex: 0, endsAt: null });
+    expect(advance(room, 13_000)).toEqual({ ok: true });
+    expect(room).toMatchObject({ phase: 'leaderboard', questionIndex: 0 });
+    expect(advance(room, 14_000)).toEqual({ ok: true });
+    expect(room).toMatchObject({ phase: 'question', questionIndex: 1, questionStartedAt: 14_000, endsAt: 34_000 });
+    expect(advance(room, 15_000)).toEqual({ ok: true });
+    expect(room.phase).toBe('reveal');
+    expect(advance(room, 16_000)).toEqual({ ok: true });
+    expect(room).toMatchObject({ phase: 'finished', questionIndex: 1 });
+    expect(advance(room, 17_000)).toEqual({ ok: false, error: 'GAME_FINISHED' });
+  });
+
+  it('refuses to start without players', () => {
+    const room = makeRoom();
+    expect(advance(room, 0)).toEqual({ ok: false, error: 'NO_PLAYERS' });
+    expect(room.phase).toBe('lobby');
+  });
+
+  it('goes from reveal straight to finished for a 1-question quiz', () => {
+    const quiz = makeQuiz();
+    quiz.questions = quiz.questions.slice(0, 1);
+    const room = roomWithPlayers(quiz);
+    advance(room, 0);
+    advance(room, 1);
+    expect(room.phase).toBe('reveal');
+    advance(room, 2);
+    expect(room.phase).toBe('finished');
+  });
+
+  it('clears the answers when the next question starts', () => {
+    const room = roomWithPlayers();
+    advance(room, 0);
+    submitAnswer(room, 'a', 1, 100);
+    advance(room, 200);
+    advance(room, 300);
+    advance(room, 400);
+    expect(room.answers.size).toBe(0);
+  });
+});
+
+describe('submitAnswer', () => {
+  it('checks errors in order: phase, player, already answered, option', () => {
+    const room = roomWithPlayers();
+    expect(submitAnswer(room, 'nobody', 99, 0)).toEqual({ ok: false, error: 'NOT_ACCEPTING_ANSWERS' });
+    advance(room, 10_000);
+    expect(submitAnswer(room, 'nobody', 99, 10_100)).toEqual({ ok: false, error: 'NOT_IN_ROOM' });
+    expect(submitAnswer(room, 'a', 1, 10_100)).toEqual({ ok: true });
+    expect(submitAnswer(room, 'a', 99, 10_200)).toEqual({ ok: false, error: 'ALREADY_ANSWERED' });
+    for (const bad of [-1, 3, 1.5, Number.NaN]) {
+      expect(submitAnswer(room, 'b', bad, 10_200)).toEqual({ ok: false, error: 'INVALID_OPTION' });
+    }
+    expect(room.answers.has('b')).toBe(false);
+  });
+
+  it('remembers points but adds them to the score only at reveal', () => {
+    const room = roomWithPlayers();
+    advance(room, 10_000);
+    submitAnswer(room, 'a', 1, 15_000); // correct, half of the 10 s limit
+    submitAnswer(room, 'b', 0, 11_000); // wrong
+    expect(room.answers.get('a')).toEqual({ optionIndex: 1, correct: true, points: 750 });
+    expect(room.answers.get('b')).toEqual({ optionIndex: 0, correct: false, points: 0 });
+    expect(score(room, 'a')).toBe(0);
+    reveal(room);
+    expect(score(room, 'a')).toBe(750);
+    expect(score(room, 'b')).toBe(0);
+    expect(room.players.get('a')?.lastPoints).toBe(750);
+  });
+
+  it('gives lastPoints 0 to a player who did not answer, even after earning points before', () => {
+    const room = roomWithPlayers();
+    advance(room, 0);
+    submitAnswer(room, 'a', 1, 0);
+    advance(room, 1); // reveal
+    expect(room.players.get('a')?.lastPoints).toBe(1000);
+    advance(room, 2); // leaderboard
+    advance(room, 3); // question 1
+    advance(room, 4); // reveal, nobody answered
+    expect(room.players.get('a')).toMatchObject({ lastPoints: 0, score: 1000 });
+  });
+});
+
+describe('shouldAutoReveal', () => {
+  it('is true when every connected player answered', () => {
+    const room = roomWithPlayers();
+    advance(room, 0);
+    submitAnswer(room, 'a', 1, 1);
+    submitAnswer(room, 'b', 1, 1);
+    expect(shouldAutoReveal(room)).toBe(true);
+  });
+
+  it('is false while a connected player has not answered', () => {
+    const room = roomWithPlayers();
+    advance(room, 0);
+    submitAnswer(room, 'a', 1, 1);
+    expect(shouldAutoReveal(room)).toBe(false);
+  });
+
+  it('ignores players who are disconnected', () => {
+    const room = roomWithPlayers();
+    advance(room, 0);
+    submitAnswer(room, 'a', 1, 1);
+    disconnectPlayer(room, 's-b');
+    expect(shouldAutoReveal(room)).toBe(true);
+  });
+
+  it('is false when nobody is connected', () => {
+    const room = roomWithPlayers();
+    advance(room, 0);
+    disconnectPlayer(room, 's-a');
+    disconnectPlayer(room, 's-b');
+    expect(shouldAutoReveal(room)).toBe(false);
+  });
+
+  it('is false outside the question phase', () => {
+    const room = roomWithPlayers();
+    expect(shouldAutoReveal(room)).toBe(false);
+    advance(room, 0);
+    submitAnswer(room, 'a', 1, 1);
+    submitAnswer(room, 'b', 1, 1);
+    reveal(room);
+    expect(shouldAutoReveal(room)).toBe(false);
   });
 });

@@ -11,6 +11,14 @@ export const ACK_TIMEOUT_MS = 3000;
 /** The latest payload of every event, per socket, so a snapshot that already arrived is never missed. */
 const latestByEvent = new WeakMap<Socket, Map<string, unknown>>();
 
+/**
+ * The socket with an ack timeout for the NEXT emit: `await ask(socket).emitWithAck('host:next')`.
+ * Socket.IO resets the timeout flag after every emit, so call ask() for each request.
+ */
+export function ask(socket: ClientSocket) {
+  return socket.timeout(ACK_TIMEOUT_MS);
+}
+
 /** Typed client; resolves once connected. */
 export function connect(url: string, options: { reconnection?: boolean } = {}): Promise<ClientSocket> {
   return open(url, options);
