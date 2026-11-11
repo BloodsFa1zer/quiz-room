@@ -1,7 +1,11 @@
 import { createServer } from 'node:http';
 import express, { type ErrorRequestHandler } from 'express';
+import { Server } from 'socket.io';
 import type { ApiError } from '@quiz/shared';
 import { DATA_FILE } from './config';
+import { createRoomManager } from './game/roomManager';
+import { registerSocketHandlers } from './game/sockets';
+import type { QuizServer } from './game/types';
 import { createQuizStore } from './quiz/quizStore';
 import { createApiRouter } from './quiz/routes';
 
@@ -20,7 +24,11 @@ export function createApp(options: AppOptions = {}) {
   app.use(handleError);
 
   const httpServer = createServer(app);
-  return { app, httpServer, store };
+  const io: QuizServer = new Server(httpServer, { cors: { origin: '*' } });
+  const rooms = createRoomManager();
+  registerSocketHandlers(io, { store, rooms });
+
+  return { app, httpServer, io, store, rooms };
 }
 
 /** Turns any error into a JSON ApiError, so clients never get an HTML page or a stack trace. */
