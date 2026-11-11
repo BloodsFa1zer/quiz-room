@@ -1,4 +1,5 @@
 import { isValidPlayerName, MAX_PLAYERS, type Ack, type Quiz } from '@quiz/shared';
+import { calcPoints } from './scoring';
 import type { Player, Room } from './types';
 
 // Game rules as pure functions over a Room. No sockets, no timers, no reading the clock:
@@ -68,6 +69,69 @@ export function disconnectPlayer(room: Room, socketId: string): Player | null {
     }
   }
   return null;
+}
+
+/** host:next — transition table from docs/00-common.md §6.4. */
+export function advance(room: Room, now: number): Ack {
+  switch (room.phase) {
+    case 'lobby':
+      if (room.players.size === 0) return { ok: false, error: 'NO_PLAYERS' };
+      startQuestion(room, 0, now);
+      return { ok: true };
+    case 'question':
+      reveal(room);
+      return { ok: true };
+    case 'reveal':
+      // After the last question the game ends without one more leaderboard.
+      room.phase = room.questionIndex === room.quiz.questions.length - 1 ? 'finished' : 'leaderboard';
+      return { ok: true };
+    case 'leaderboard':
+      startQuestion(room, room.questionIndex + 1, now);
+      return { ok: true };
+    case 'finished':
+      return { ok: false, error: 'GAME_FINISHED' };
+  }
+}
+
+export function submitAnswer(room: Room, playerId: string, optionIndex: number, now: number): Ack {
+  if (room.phase !== 'question') return { ok: false, error: 'NOT_ACCEPTING_ANSWERS' };
+  if (!room.players.has(playerId)) return { ok: false, error: 'NOT_IN_ROOM' };
+  if (room.answers.has(playerId)) return { ok: false, error: 'ALREADY_ANSWERED' };
+  const question = room.quiz.questions[room.questionIndex];
+  if (!Number.isInteger(optionIndex) || optionIndex < 0 || optionIndex >= question.options.length) {
+    return { ok: false, error: 'INVALID_OPTION' };
+  }
+  const correct = optionIndex === question.correctIndex;
+  const elapsedMs = now - (room.questionStartedAt ?? now);
+  // Points are only remembered here; the score changes at reveal, so nothing leaks during the question.
+  const points = correct ? calcPoints(elapsedMs, question.timeLimitSec * 1000) : 0;
+  room.answers.set(playerId, { optionIndex, correct, points });
+  return { ok: true };
+}
+
+/** true when phase is `question`, at least one player is connected and every connected player has answered. */
+export function shouldAutoReveal(room: Room): boolean {
+  if (room.phase !== 'question') return false;
+  const connected = [...room.players.values()].filter((p) => p.socketId !== null);
+  return connected.length > 0 && connected.every((p) => room.answers.has(p.id));
+}
+
+/** question → reveal: adds points to scores, sets lastPoints for EVERY player (0 if no answer). */
+export function reveal(room: Room): void {
+  room.phase = 'reveal';
+  room.endsAt = null;
+  for (const player of room.players.values()) {
+    player.lastPoints = room.answers.get(player.id)?.points ?? 0;
+    player.score += player.lastPoints;
+  }
+}
+
+function startQuestion(room: Room, index: number, now: number): void {
+  room.phase = 'question';
+  room.questionIndex = index;
+  room.answers.clear();
+  room.questionStartedAt = now;
+  room.endsAt = now + room.quiz.questions[index].timeLimitSec * 1000;
 }
 
 function findByName(room: Room, name: string): Player | undefined {
