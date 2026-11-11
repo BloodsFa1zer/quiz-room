@@ -1,0 +1,12 @@
+/* Sits in the middle of the free space under the logo. */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: auto 0;
+  text-align: center;
+}
+
+.hint {
+  color: var(--text-muted);
+}

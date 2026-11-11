@@ -1,0 +1,36 @@
+.screen {
+  width: 100%;
+  margin: 0 auto;
+  /* A long name or title wraps instead of pushing the page wider than the screen. */
+  overflow-wrap: anywhere;
+}
+
+/* phone: one column up to 480px that fills the visible part of the screen; children take the full width. */
+.phone {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 480px;
+  min-height: 100dvh;
+  padding: var(--space-5) var(--space-4);
+  /* Keeps the last button above the home indicator on phones without a physical button. */
+  padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom));
+}
+
+/* stage: exactly one projector screen, never scrolls; the font grows with the window width. */
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2vw, 32px);
+  height: 100dvh;
+  padding: clamp(16px, 3vw, 48px);
+  overflow: hidden;
+  font-size: clamp(18px, 1.8vw, 32px);
+}
+
+/* page: an ordinary laptop page up to 880px wide, vertical scroll is allowed. */
+.page {
+  max-width: 880px;
+  min-height: 100dvh;
+  padding: var(--space-6) var(--space-4);
+}
