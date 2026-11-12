@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { PlayerHeader } from '../../components/game/PlayerHeader';
 import { Screen } from '../../components/ui/Screen';
 import { formatScore } from '../../lib/format';
@@ -11,9 +12,22 @@ const OUTCOMES = {
   timeout: { icon: '⏱', title: 'Час вийшов' },
 };
 
+// One pulse for a right answer, two for a wrong one (or none): the result is felt before it is read.
+const VIBRATE_CORRECT = 200;
+const VIBRATE_WRONG = [120, 100, 120];
+
 /** Phase `reveal`: whether the player's answer was right and, if not, which one was. */
 export function PlayerReveal({ state }: PlayerScreenProps) {
   const { question, correctIndex, lastResult } = state;
+  const correct = lastResult?.correct ?? null;
+
+  useEffect(() => {
+    if (correct === null) return;
+    // A page may vibrate only after the player has touched it; earlier (e.g. right after a refresh)
+    // Chrome blocks the call and logs an error. Where there is no API at all (iPhone), `?.` skips it.
+    if (!navigator.userActivation?.hasBeenActive) return;
+    navigator.vibrate?.(correct ? VIBRATE_CORRECT : VIBRATE_WRONG);
+  }, [correct]);
 
   if (question === null || correctIndex === null || lastResult === null) return null;
 

@@ -1,3 +1,4 @@
+import { Confetti } from '../../components/game/Confetti';
 import { LeaderboardList } from '../../components/game/LeaderboardList';
 import { Podium } from '../../components/game/Podium';
 import { Button } from '../../components/ui/Button';
@@ -17,6 +18,7 @@ const PODIUM_PLACES = 3;
 export function HostFinished({ state, onExit }: HostFinishedProps) {
   return (
     <Screen variant="stage">
+      <Confetti />
       <HostHeader title="Гру завершено!">
         <Button variant="secondary" size="l" onClick={onExit}>
           До списку квізів
