@@ -7,6 +7,7 @@ const NEXT_TIMEOUT_MS = 5000;
 // The two clicks of a double click are ~100–300 ms apart, but in a local network the server answers
 // within a few ms. Without this pause the second click would hit the button of the next screen (G13).
 const DOUBLE_CLICK_MS = 500;
+const OFFLINE_MESSAGE = 'Немає зʼєднання з сервером — спробуй ще раз за мить';
 
 type Snapshot = { state: HostState; clockOffset: number };
 
@@ -36,21 +37,33 @@ export function useHostRoom(pin: string) {
         if (!res.ok) setError(res.error);
       });
 
+    // Also fires on every reconnect. The error of a "Далі" pressed while offline no longer applies then.
+    const onConnect = () => {
+      setNextError(null);
+      join();
+    };
+
     socket.on('host:state', onState);
     socket.on('room:closed', onClosed);
-    socket.on('connect', join); // also fires on every reconnect
+    socket.on('connect', onConnect);
     if (socket.connected) join();
 
     return () => {
       socket.off('host:state', onState);
       socket.off('room:closed', onClosed);
-      socket.off('connect', join);
+      socket.off('connect', onConnect);
     };
   }, [pin]);
 
   // The same function on every render: the page's keyboard listener subscribes to it once.
   const next = useCallback(() => {
     if (busyRef.current || Date.now() - lastNextAt.current < DOUBLE_CLICK_MS) return;
+    // socket.io would keep the command until the reconnect and send it before the re-join,
+    // so the server would answer NOT_IN_ROOM ("приєднайся ще раз"), which is wrong for the host.
+    if (!socket.connected) {
+      setNextError(OFFLINE_MESSAGE);
+      return;
+    }
     busyRef.current = true;
     lastNextAt.current = Date.now();
     setBusy(true);

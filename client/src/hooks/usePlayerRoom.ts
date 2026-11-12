@@ -57,6 +57,10 @@ export function usePlayerRoom(pin: string) {
 
   function answer(optionIndex: number) {
     if (state === null || state.myAnswer !== null || pendingAnswer !== null) return;
+    // socket.io would keep the answer until the reconnect and send it before the re-join: the server
+    // would refuse it (NOT_IN_ROOM) after the player had already seen "Відповідь прийнято".
+    // So while offline a tap does nothing, and the connection banner tells why.
+    if (!socket.connected) return;
     const { questionIndex } = state;
     // Optimistic: the buttons are blocked at once, without waiting for the server (the only guess allowed, R6).
     setPending({ questionIndex, optionIndex });
