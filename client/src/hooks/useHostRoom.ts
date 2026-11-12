@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ERROR_MESSAGES, type ErrorCode, type HostState } from '@quiz/shared';
 import { socket } from '../lib/socket';
 
@@ -48,7 +48,8 @@ export function useHostRoom(pin: string) {
     };
   }, [pin]);
 
-  function next() {
+  // The same function on every render: the page's keyboard listener subscribes to it once.
+  const next = useCallback(() => {
     if (busyRef.current || Date.now() - lastNextAt.current < DOUBLE_CLICK_MS) return;
     busyRef.current = true;
     lastNextAt.current = Date.now();
@@ -60,7 +61,7 @@ export function useHostRoom(pin: string) {
       if (err) setNextError('Сервер не відповідає');
       else if (!res.ok) setNextError(ERROR_MESSAGES[res.error]);
     });
-  }
+  }, []);
 
   return {
     state: snapshot?.state ?? null,

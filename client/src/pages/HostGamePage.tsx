@@ -19,6 +19,9 @@ import { HostQuestion } from '../screens/host/HostQuestion';
 import { HostReveal } from '../screens/host/HostReveal';
 import styles from './HostGamePage.module.css';
 
+// Keys of a presentation: they do what the main button of the screen does.
+const NEXT_KEYS = [' ', 'Enter', 'ArrowRight'];
+
 /** `/host/:pin` — the host's game on the projector: the screen is picked by the phase of the latest snapshot. */
 export function HostGamePage() {
   const { pin = '' } = useParams();
@@ -34,6 +37,31 @@ export function HostGamePage() {
       .then((config) => setLanIp(config.lanIp))
       .catch(() => setLanIp(null));
   }, []);
+
+  const { state, next } = room;
+  // The keys work only where the main button is active: not before the first snapshot, not on the
+  // "game not found" card, not in an empty lobby and not after the game.
+  const keysEnabled =
+    state !== null &&
+    !room.closed &&
+    room.error === null &&
+    state.phase !== 'finished' &&
+    !(state.phase === 'lobby' && state.players.length === 0);
+
+  useEffect(() => {
+    if (!keysEnabled) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      // A held key repeats keydown: without this, holding Space would run through all the phases.
+      if (!NEXT_KEYS.includes(event.key) || event.repeat) return;
+      if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+      // A focused button or field handles these keys itself; calling next() too would skip a phase.
+      if (event.target instanceof Element && event.target.closest('button, input, textarea, select')) return;
+      event.preventDefault();
+      next(); // blocked while busy, exactly like a click
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [keysEnabled, next]);
 
   const goToQuizzes = () => navigate('/quizzes');
 
@@ -54,7 +82,6 @@ export function HostGamePage() {
       );
     }
 
-    const { state } = room;
     if (state === null) {
       return (
         <Screen variant="stage">
