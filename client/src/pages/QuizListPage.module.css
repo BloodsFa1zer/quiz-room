@@ -70,16 +70,3 @@
   align-items: flex-start;
   gap: var(--space-2);
 }
-
-/* The disabled launch button with its hint under it. */
-.launch {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.hint {
-  color: var(--text-muted);
-  font-size: 0.8125rem;
-}

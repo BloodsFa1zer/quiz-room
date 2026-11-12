@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import type { QuizSummary } from '@quiz/shared';
+import { ERROR_MESSAGES, type QuizSummary } from '@quiz/shared';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Logo } from '../components/ui/Logo';
@@ -9,7 +9,11 @@ import { Screen } from '../components/ui/Screen';
 import { Spinner } from '../components/ui/Spinner';
 import { ApiRequestError, deleteQuiz, listQuizzes } from '../lib/api';
 import { plural } from '../lib/format';
+import { socket } from '../lib/socket';
 import styles from './QuizListPage.module.css';
+
+// How long the host waits for the server to create a room.
+const CREATE_TIMEOUT_MS = 5000;
 
 function errorText(error: unknown): string {
   return error instanceof ApiRequestError ? error.message : 'Щось пішло не так';
@@ -22,6 +26,8 @@ export function QuizListPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [launchError, setLaunchError] = useState<string | null>(null);
+  const [launchingId, setLaunchingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setQuizzes(null);
@@ -52,6 +58,18 @@ export function QuizListPage() {
     }
   }
 
+  function launch(quiz: QuizSummary) {
+    setLaunchingId(quiz.id);
+    setLaunchError(null);
+    // This socket becomes the host of the new room; the game page then joins it once more by PIN.
+    socket.timeout(CREATE_TIMEOUT_MS).emit('host:create', { quizId: quiz.id }, (err, res) => {
+      setLaunchingId(null);
+      if (err) return setLaunchError(`Не вдалося запустити квіз «${quiz.title}»: Сервер не відповідає`);
+      if (!res.ok) return setLaunchError(`Не вдалося запустити квіз «${quiz.title}»: ${ERROR_MESSAGES[res.error]}`);
+      navigate(`/host/${res.pin}`);
+    });
+  }
+
   const createButton = <Button onClick={() => navigate('/quizzes/new')}>Створити квіз</Button>;
 
   return (
@@ -66,6 +84,7 @@ export function QuizListPage() {
 
       <h1 className={styles.title}>Квізи</h1>
 
+      {launchError && <Notice tone="error">{launchError}</Notice>}
       {deleteError && <Notice tone="error">{deleteError}</Notice>}
 
       {loadError !== null ? (
@@ -98,12 +117,9 @@ export function QuizListPage() {
                     </p>
                   </div>
                   <div className={styles.actions}>
-                    <span className={styles.launch}>
-                      <Button disabled title="Зʼявиться на етапі B5">
-                        Запустити
-                      </Button>
-                      <span className={styles.hint}>Зʼявиться на етапі B5</span>
-                    </span>
+                    <Button loading={launchingId === quiz.id} onClick={() => launch(quiz)}>
+                      Запустити
+                    </Button>
                     <Button variant="secondary" onClick={() => navigate(`/quizzes/${quiz.id}`)}>
                       Редагувати
                     </Button>
