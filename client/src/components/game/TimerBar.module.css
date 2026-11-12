@@ -1,0 +1,38 @@
+.timer {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  /* One colour for the bar and the number: both switch together in the last seconds. */
+  color: var(--accent);
+}
+
+.warning {
+  color: var(--warning);
+}
+
+.track {
+  flex: 1;
+  height: 0.6em;
+  overflow: hidden;
+  border-radius: var(--radius-s);
+  background: var(--surface-2);
+}
+
+.fill {
+  height: 100%;
+  border-radius: var(--radius-s);
+  background: currentColor;
+  /* The width is updated every 100 ms; the transition makes the steps invisible. */
+  transition: width 0.1s linear;
+}
+
+.seconds {
+  flex: none;
+  /* Room for three digits (the longest limit is 120 s), so the bar keeps its width. */
+  min-width: 3ch;
+  font-size: 1.6em;
+  font-weight: 800;
+  line-height: 1;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

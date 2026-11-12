@@ -1,0 +1,17 @@
+/* The podium on the left, the full table on the right. */
+.body {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: clamp(16px, 3.5vw, 64px);
+  min-height: 0;
+}
+
+/* The table is centred while it fits and scrolls inside itself when there are many players. */
+.table {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+  font-size: 0.8em;
+}

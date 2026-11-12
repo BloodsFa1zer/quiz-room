@@ -1,92 +1,135 @@
-import type { ReactNode } from 'react';
-import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
-import { Logo } from '../components/ui/Logo';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Notice } from '../components/ui/Notice';
-import { Screen } from '../components/ui/Screen';
-import { Spinner } from '../components/ui/Spinner';
-import { TextInput } from '../components/ui/TextInput';
+import { hostFixtures, playerFixtures } from '../fixtures/states';
+import { HostPreview } from './dev/HostPreview';
+import { UiKitShowcase } from './dev/UiKitShowcase';
 import styles from './DevGalleryPage.module.css';
 
-const VARIANTS = ['primary', 'secondary', 'ghost', 'danger'] as const;
-const SIZES = ['m', 'l'] as const;
+// Screen id in the address is `<group>/<key>`: the host and the player have fixtures with equal keys.
+const GROUPS = [
+  { id: 'ui', title: 'UI-кіт', keys: ['kit'] },
+  { id: 'host', title: 'Ведучий', keys: Object.keys(hostFixtures) },
+  { id: 'player', title: 'Гравець', keys: Object.keys(playerFixtures) },
+];
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+// Host screens are made for a projector: they are previewed in a 16:9 frame of this size.
+const STAGE_FRAME = { width: 1280, height: 720 };
+
+/**
+ * Development-only gallery: every screen in every state, drawn from fixtures without a server.
+ * `?screen=host/question-4` picks the screen; `&view=full` shows it alone on the whole page.
+ */
+export function DevGalleryPage() {
+  const [params] = useSearchParams();
+  const screen = params.get('screen') ?? 'ui/kit';
+  const view = params.get('view');
+
+  // The bare screen: `view=full` is the "full screen" switch, `view=frame` is what a frame loads.
+  if (view !== null) {
+    return (
+      <>
+        <GalleryScreen id={screen} />
+        {view === 'full' && (
+          <Link className={styles.exit} to={`/dev?screen=${screen}`} title="Вийти з повного екрана">
+            ✕
+          </Link>
+        )}
+      </>
+    );
+  }
+
   return (
-    <section className={styles.section}>
-      <h2 className={styles.sectionTitle}>{title}</h2>
-      {children}
-    </section>
+    <div className={styles.gallery}>
+      <nav className={styles.nav}>
+        <Link className={styles.fullLink} to={`/dev?screen=${screen}&view=full`}>
+          На весь екран
+        </Link>
+        {GROUPS.map((group) => (
+          <section key={group.id}>
+            <h2 className={styles.groupTitle}>{group.title}</h2>
+            {group.keys.length === 0 && <p className={styles.empty}>Екранів ще немає</p>}
+            <ul className={styles.links}>
+              {group.keys.map((key) => {
+                const id = `${group.id}/${key}`;
+                return (
+                  <li key={id}>
+                    <Link
+                      className={id === screen ? `${styles.link} ${styles.active}` : styles.link}
+                      to={`/dev?screen=${id}`}
+                    >
+                      {key}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ))}
+      </nav>
+
+      <div className={styles.preview}>
+        {screen.startsWith('ui/') ? (
+          <GalleryScreen id={screen} />
+        ) : (
+          <Frame src={`/dev?screen=${screen}&view=frame`} width={STAGE_FRAME.width} height={STAGE_FRAME.height} />
+        )}
+      </div>
+    </div>
   );
 }
 
-/** Development-only showcase of the UI kit. Game screens on fixtures are added in stage B2. */
-export function DevGalleryPage() {
+/** Draws one gallery screen by its id, e.g. `ui/kit` or `host/question-4`. */
+function GalleryScreen({ id }: { id: string }) {
+  const [group, key = ''] = id.split('/');
+
+  if (id === 'ui/kit') return <UiKitShowcase />;
+  if (group === 'host' && Object.hasOwn(hostFixtures, key)) {
+    // The key remounts the preview for every fixture, so each one starts its own timer.
+    return <HostPreview key={key} fixture={hostFixtures[key]} />;
+  }
   return (
-    <Screen variant="page">
-      <div className={styles.gallery}>
-        <h1>Галерея UI-кіта</h1>
+    <div className={styles.unknown}>
+      <Notice tone="error">Невідомий екран: {id}</Notice>
+    </div>
+  );
+}
 
-        <Section title="Logo">
-          <Logo />
-        </Section>
+type FrameProps = { src: string; width: number; height: number };
 
-        <Section title="Button">
-          {SIZES.map((size) => (
-            <div className={styles.row} key={size}>
-              {VARIANTS.map((variant) => (
-                <Button key={variant} variant={variant} size={size}>
-                  {variant} · {size}
-                </Button>
-              ))}
-            </div>
-          ))}
-          <div className={styles.row}>
-            {VARIANTS.map((variant) => (
-              <Button key={variant} variant={variant} loading>
-                loading
-              </Button>
-            ))}
-          </div>
-          <div className={styles.row}>
-            {VARIANTS.map((variant) => (
-              <Button key={variant} variant={variant} disabled>
-                disabled
-              </Button>
-            ))}
-          </div>
-          <Button size="l" fullWidth>
-            fullWidth · l
-          </Button>
-        </Section>
+/**
+ * A page inside an iframe of a fixed size, scaled to fit the free space.
+ * An iframe has its own viewport: `vw`, `dvh` and media queries of the screen inside are counted
+ * from the frame, exactly as on a real projector or phone of that size.
+ */
+function Frame({ src, width, height }: FrameProps) {
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0);
 
-        <Section title="TextInput">
-          <TextInput label="Твоє імʼя" placeholder="Наприклад, Оля" />
-          <TextInput label="Код гри" defaultValue="12345" error="Код гри має містити 6 цифр" />
-        </Section>
+  useEffect(() => {
+    const box = boxRef.current;
+    if (box === null) return;
+    // Fires right after `observe` and then on every change of the free space.
+    const observer = new ResizeObserver(() => {
+      setScale(Math.min(box.clientWidth / width, box.clientHeight / height));
+    });
+    observer.observe(box);
+    return () => observer.disconnect();
+  }, [width, height]);
 
-        <Section title="Notice">
-          <Notice tone="info">Гра почнеться, щойно ведучий натисне «Почати».</Notice>
-          <Notice tone="error">Гру з таким кодом не знайдено</Notice>
-          <Notice tone="success">Квіз збережено</Notice>
-        </Section>
-
-        <Section title="Card">
-          <Card>
-            <h3>Столиці світу</h3>
-            <p>5 питань</p>
-          </Card>
-        </Section>
-
-        <Section title="Spinner">
-          <div className={styles.row}>
-            <Spinner />
-            <span className={styles.bigSpinner}>
-              <Spinner />
-            </span>
-          </div>
-        </Section>
+  return (
+    <div className={styles.frameBox} ref={boxRef}>
+      {/* `transform` does not change the size an element takes in the layout, so this box does it. */}
+      <div className={styles.frameSize} style={{ width: width * scale, height: height * scale }}>
+        <iframe
+          // A new iframe per screen: changing `src` of the old one would add an entry to the browser history.
+          key={src}
+          className={styles.frame}
+          title={src}
+          src={src}
+          style={{ width, height, transform: `scale(${scale})` }}
+        />
       </div>
-    </Screen>
+    </div>
   );
 }

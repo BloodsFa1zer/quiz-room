@@ -1,0 +1,86 @@
+.bars {
+  display: flex;
+  justify-content: center;
+  gap: clamp(12px, 3vw, 56px);
+  height: 100%;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3em;
+  width: clamp(64px, 11vw, 200px);
+  min-height: 0;
+  /* Wrong options step back, the correct one stays bright. */
+  opacity: 0.45;
+}
+
+.correct {
+  opacity: 1;
+}
+
+/* The area a bar grows in. The top padding keeps room for the number above the tallest bar. */
+.track {
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  width: 100%;
+  min-height: 0;
+  padding-top: 1.7em;
+  border-bottom: 3px solid var(--border);
+}
+
+.bar {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-s) var(--radius-s) 0 0;
+  background: var(--bar-color);
+}
+
+/* The number sits on top of its bar, also when the bar has zero height. */
+.count {
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  font-size: 1.2em;
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: center;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.correct .count {
+  color: var(--success);
+}
+
+.letter {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.6em;
+  height: 1.6em;
+  border-radius: var(--radius-s);
+  background: var(--bar-color);
+  font-size: 0.9em;
+  font-weight: 800;
+}
+
+/* Colour by option index. */
+.opt0 {
+  --bar-color: var(--opt-0);
+}
+
+.opt1 {
+  --bar-color: var(--opt-1);
+}
+
+.opt2 {
+  --bar-color: var(--opt-2);
+}
+
+.opt3 {
+  --bar-color: var(--opt-3);
+}

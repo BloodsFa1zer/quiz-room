@@ -1,0 +1,27 @@
+.joinQr {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  width: 100%;
+}
+
+.pad {
+  padding: 6%;
+  border-radius: var(--radius-m);
+  background: var(--qr-bg);
+}
+
+/* The SVG scales to the width of the pad and stays square. */
+.code {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.url {
+  font-size: 0.85em;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  overflow-wrap: anywhere;
+}

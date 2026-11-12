@@ -1,0 +1,62 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  /* In a parent of limited height the list scrolls inside itself. */
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.7em;
+  padding: 0.3em 0.9em;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-m);
+  background: var(--surface);
+  line-height: 1.3;
+}
+
+.highlight {
+  border-color: var(--accent);
+  background: var(--surface-2);
+}
+
+.rank {
+  flex: none;
+  min-width: 2ch;
+  color: var(--text-muted);
+  font-weight: 800;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A long name is cut with an ellipsis instead of pushing the score out of the row. */
+.name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.delta {
+  flex: none;
+  color: var(--success);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.score {
+  flex: none;
+  min-width: 5ch;
+  font-weight: 800;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,58 @@
+.podium {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(8px, 1.2vw, 20px);
+  height: 100%;
+}
+
+/* Name and score stand on top of the step; everything is pressed to the bottom of the podium. */
+.slot {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 0;
+  text-align: center;
+}
+
+.name {
+  font-size: 1.15em;
+  font-weight: 800;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.score {
+  margin-bottom: 0.4em;
+  color: var(--text-muted);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.step {
+  display: grid;
+  flex: none;
+  place-items: center;
+  border-top: 8px solid var(--step-color);
+  border-radius: var(--radius-m) var(--radius-m) 0 0;
+  background: var(--surface-2);
+  color: var(--step-color);
+  font-size: 3em;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* Heights are shares of the podium height: the higher the place, the taller the step. */
+.first {
+  --step-color: var(--warning);
+  height: 62%;
+}
+
+.second {
+  --step-color: var(--text);
+  height: 44%;
+}
+
+.third {
+  --step-color: var(--opt-2);
+  height: 30%;
+}

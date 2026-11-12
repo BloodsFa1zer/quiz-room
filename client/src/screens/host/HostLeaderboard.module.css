@@ -1,0 +1,11 @@
+/* Five big rows in the middle of the screen. */
+.board {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  align-self: center;
+  width: 76%;
+  min-height: 0;
+  font-size: 1.5em;
+}

@@ -17,6 +17,9 @@
   --opt-2: #ea580c;
   --opt-3: #db2777;
 
+  /* Pad under the QR code: stays white on the dark theme, otherwise phone cameras cannot read it. */
+  --qr-bg: #ffffff;
+
   --radius-s: 8px;
   --radius-m: 14px;
   --radius-l: 24px;

@@ -1,0 +1,9 @@
+.pin {
+  display: flex;
+  gap: 0.25em;
+  font-size: clamp(64px, 11vw, 168px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}

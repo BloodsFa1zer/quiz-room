@@ -1,0 +1,29 @@
+.question {
+  /* Cut after three lines: whatever the text, the chart and the options stay on the screen. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  flex: none;
+  overflow: hidden;
+  /* Smaller than on the question screen: here the chart is the main thing. */
+  font-size: clamp(22px, 2.6vw, 44px);
+  font-weight: 800;
+  line-height: 1.2;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.long {
+  font-size: clamp(18px, 2vw, 34px);
+}
+
+/* The chart takes the height that is left after the question and the options below it. */
+.bars {
+  flex: 1;
+  min-height: 0;
+}
+
+/* The options are only as tall as their texts need. */
+.options {
+  flex: none;
+}
