@@ -1,0 +1,62 @@
+.title {
+  margin: var(--space-6) 0 var(--space-5);
+  font-size: 2rem;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--text-muted);
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  /* Room for the fixed bar, so it never covers the last button of the form. */
+  padding-bottom: 96px;
+}
+
+.errors {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-5);
+}
+
+.questions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Cancel and Save stay at the bottom of the window however long the quiz is. */
+.bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom));
+}
+
+/* Lines the buttons up with the 880px content column of the page. */
+.barInner {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
