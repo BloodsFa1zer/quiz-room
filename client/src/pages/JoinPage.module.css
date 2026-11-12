@@ -1,0 +1,19 @@
+.logo {
+  margin-top: var(--space-6);
+  font-size: 2rem;
+  text-align: center;
+}
+
+/* Sits in the middle of the free height, between the logo and the host link. */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: auto 0;
+}
+
+.hostLink {
+  align-self: center;
+  padding: var(--space-3);
+  font-weight: 600;
+}
