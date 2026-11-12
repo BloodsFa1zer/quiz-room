@@ -1,0 +1,16 @@
+/* Lies over the top of the page, so the screen under it does not jump when it appears. */
+.banner {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 10;
+  padding: var(--space-3) var(--space-4);
+  /* Keeps the text below the notch on phones. */
+  padding-top: calc(var(--space-3) + env(safe-area-inset-top));
+  background: var(--warning);
+  color: var(--bg);
+  font-weight: 700;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
