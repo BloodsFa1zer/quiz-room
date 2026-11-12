@@ -2,9 +2,11 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Logo } from '../components/ui/Logo';
 import { Screen } from '../components/ui/Screen';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import styles from './NotFoundPage.module.css';
 
 export function NotFoundPage() {
+  useDocumentTitle('Сторінку не знайдено');
   const navigate = useNavigate();
 
   return (

@@ -8,6 +8,7 @@ import { Notice } from '../components/ui/Notice';
 import { Screen } from '../components/ui/Screen';
 import { Spinner } from '../components/ui/Spinner';
 import { TextInput } from '../components/ui/TextInput';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { ApiRequestError, createQuiz, getQuiz, updateQuiz } from '../lib/api';
 import * as drafts from '../lib/quizDraft';
 import { QuestionEditor } from './editor/QuestionEditor';
@@ -23,6 +24,8 @@ function snapshot(draft: drafts.QuizDraft): string {
 export function QuizEditorPage() {
   // No quizId in the address means the page was opened as /quizzes/new.
   const { quizId } = useParams();
+  const heading = quizId ? 'Редагування квізу' : 'Новий квіз';
+  useDocumentTitle(heading);
   const navigate = useNavigate();
   const [draft, setDraft] = useState<drafts.QuizDraft | null>(() => (quizId ? null : drafts.emptyDraft()));
   const [saved, setSaved] = useState(() => (draft ? snapshot(draft) : ''));
@@ -101,7 +104,7 @@ export function QuizEditorPage() {
   return (
     <Screen variant="page">
       <Logo />
-      <h1 className={styles.title}>{quizId ? 'Редагування квізу' : 'Новий квіз'}</h1>
+      <h1 className={styles.title}>{heading}</h1>
 
       {loadError !== null ? (
         <div className={styles.state}>

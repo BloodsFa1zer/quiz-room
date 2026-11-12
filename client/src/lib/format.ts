@@ -25,3 +25,9 @@ export function formatScore(n: number): string {
 export function formatPoints(n: number): string {
   return `${formatScore(n)} ${plural(n, ['бал', 'бали', 'балів'])}`;
 }
+
+/** The game code as it is read aloud, split in the middle: '123456' → '123 456'. */
+export function formatPin(pin: string): string {
+  const middle = Math.ceil(pin.length / 2);
+  return `${pin.slice(0, middle)} ${pin.slice(middle)}`;
+}

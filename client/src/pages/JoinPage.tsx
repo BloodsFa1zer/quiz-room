@@ -8,6 +8,7 @@ import { Notice } from '../components/ui/Notice';
 import { Screen } from '../components/ui/Screen';
 import { TextInput } from '../components/ui/TextInput';
 import { useConnection } from '../hooks/useConnection';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { createId } from '../lib/id';
 import { loadSession, saveSession } from '../lib/session';
 import { socket } from '../lib/socket';
@@ -22,6 +23,7 @@ function onlyDigits(value: string): string {
 
 /** `/` — the player enters the game code and a name. The code may come from the QR (`?pin=`). */
 export function JoinPage() {
+  useDocumentTitle('Вхід');
   const navigate = useNavigate();
   const connected = useConnection();
   const [searchParams] = useSearchParams();

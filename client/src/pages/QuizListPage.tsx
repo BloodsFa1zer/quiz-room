@@ -7,6 +7,7 @@ import { Logo } from '../components/ui/Logo';
 import { Notice } from '../components/ui/Notice';
 import { Screen } from '../components/ui/Screen';
 import { Spinner } from '../components/ui/Spinner';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { ApiRequestError, deleteQuiz, listQuizzes } from '../lib/api';
 import { plural } from '../lib/format';
 import { socket } from '../lib/socket';
@@ -20,6 +21,7 @@ function errorText(error: unknown): string {
 }
 
 export function QuizListPage() {
+  useDocumentTitle('Квізи');
   const navigate = useNavigate();
   // null while the list is loading or failed to load.
   const [quizzes, setQuizzes] = useState<QuizSummary[] | null>(null);

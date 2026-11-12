@@ -7,7 +7,9 @@ import { Screen } from '../components/ui/Screen';
 import { Spinner } from '../components/ui/Spinner';
 import { useConnection } from '../hooks/useConnection';
 import { useCountdown } from '../hooks/useCountdown';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { usePlayerRoom } from '../hooks/usePlayerRoom';
+import { formatPin } from '../lib/format';
 import { clearSession } from '../lib/session';
 import { PlayerAnswered } from '../screens/player/PlayerAnswered';
 import { PlayerFinished } from '../screens/player/PlayerFinished';
@@ -20,6 +22,7 @@ import styles from './PlayerGamePage.module.css';
 /** `/play/:pin` — the player's game: the screen is picked by the phase of the latest snapshot. */
 export function PlayerGamePage() {
   const { pin = '' } = useParams();
+  useDocumentTitle(formatPin(pin));
   const navigate = useNavigate();
   const connected = useConnection();
   const room = usePlayerRoom(pin);

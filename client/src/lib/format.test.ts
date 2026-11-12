@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatPoints, formatScore, plural } from './format';
+import { formatPin, formatPoints, formatScore, plural } from './format';
 
 const FORMS = ['гравець', 'гравці', 'гравців'] as const;
 
@@ -43,5 +43,12 @@ describe('formatPoints', () => {
     expect(formatPoints(850)).toBe('850 балів');
     expect(formatPoints(1730)).toBe('1 730 балів');
     expect(formatPoints(7422)).toBe('7 422 бали');
+  });
+});
+
+describe('formatPin', () => {
+  it('splits a six-digit code in the middle', () => {
+    expect(formatPin('123456')).toBe('123 456');
+    expect(formatPin('900001')).toBe('900 001');
   });
 });

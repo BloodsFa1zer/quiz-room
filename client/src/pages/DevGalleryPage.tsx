@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Notice } from '../components/ui/Notice';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { hostFixtures, playerFixtures } from '../fixtures/states';
 import { HostPreview } from './dev/HostPreview';
 import { PlayerPreview } from './dev/PlayerPreview';
@@ -35,6 +36,7 @@ const PHONE_FRAMES = [
  * `?screen=host/question-4` picks the screen; `&view=full` shows it alone on the whole page.
  */
 export function DevGalleryPage() {
+  useDocumentTitle('Галерея екранів');
   const [params] = useSearchParams();
   const screen = params.get('screen') ?? 'ui/kit';
   const view = params.get('view');

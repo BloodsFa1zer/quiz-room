@@ -7,8 +7,10 @@ import { Notice } from '../components/ui/Notice';
 import { Screen } from '../components/ui/Screen';
 import { Spinner } from '../components/ui/Spinner';
 import { useConnection } from '../hooks/useConnection';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useHostRoom } from '../hooks/useHostRoom';
 import { getConfig } from '../lib/api';
+import { formatPin } from '../lib/format';
 import { buildJoinUrl } from '../lib/joinUrl';
 import { HostFinished } from '../screens/host/HostFinished';
 import { HostLeaderboard } from '../screens/host/HostLeaderboard';
@@ -20,6 +22,7 @@ import styles from './HostGamePage.module.css';
 /** `/host/:pin` — the host's game on the projector: the screen is picked by the phase of the latest snapshot. */
 export function HostGamePage() {
   const { pin = '' } = useParams();
+  useDocumentTitle(formatPin(pin));
   const navigate = useNavigate();
   const connected = useConnection();
   const room = useHostRoom(pin);
