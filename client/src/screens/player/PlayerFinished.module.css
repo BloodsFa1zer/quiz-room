@@ -1,0 +1,31 @@
+/* Takes the free height and keeps the result in the middle; the button stays at the bottom. */
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.medal {
+  font-size: 5rem;
+  line-height: 1;
+}
+
+.place {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.score {
+  color: var(--accent);
+  font-size: 1.375rem;
+  font-weight: 800;
+}

@@ -1,0 +1,39 @@
+.summary {
+  flex: none;
+  text-align: center;
+}
+
+.place {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.score {
+  color: var(--accent);
+  font-size: 1.375rem;
+  font-weight: 800;
+}
+
+/* The list sizes its rows in em, so the font size here sets the size of the whole table. */
+.table {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: 0;
+  font-size: 1.125rem;
+}
+
+/* Looks like the highlighted row of the list: the player finds "their" colour again. */
+.myRow {
+  flex: none;
+  padding: 0.3em 0.9em;
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-m);
+  background: var(--surface-2);
+  font-weight: 800;
+  line-height: 1.3;
+  text-align: center;
+}

@@ -17,6 +17,11 @@
   padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom));
 }
 
+/* With `min-height` alone the height is not definite, and a child's `height: 100%` would be ignored. */
+.fit {
+  height: 100dvh;
+}
+
 /* stage: exactly one projector screen, never scrolls; the font grows with the window width. */
 .stage {
   display: flex;

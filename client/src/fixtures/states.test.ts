@@ -91,6 +91,11 @@ function expectPlayerRules(state: PlayerState) {
   if (state.lastResult !== null && myAnswer === null) {
     expect(state.lastResult).toEqual({ correct: false, points: 0 });
   }
+  // Points are given for the correct option only, and a correct answer always earns some (§6.6).
+  if (state.lastResult !== null) {
+    expect(state.lastResult.correct).toBe(myAnswer === state.correctIndex);
+    expect(state.lastResult.points > 0).toBe(state.lastResult.correct);
+  }
 
   if (phase === 'lobby') expect(me.score).toBe(0);
   expect(me.rank).toBeGreaterThanOrEqual(1);

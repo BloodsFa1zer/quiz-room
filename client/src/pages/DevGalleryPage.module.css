@@ -62,6 +62,30 @@
   text-decoration: none;
 }
 
+/* Size switch of the phone frame: three equal buttons in one row. */
+.sizes {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.size {
+  flex: 1;
+  /* No side padding: the three labels just fit the width of the navigation. */
+  padding: var(--space-1) 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+/* `.size` comes after `.active` in this file, so the chosen size needs its own, stronger rule. */
+.size.active {
+  border-color: var(--accent-strong);
+  background: var(--accent-strong);
+}
+
 /* The UI kit scrolls here; a frame fills the box below. */
 .preview {
   position: relative;

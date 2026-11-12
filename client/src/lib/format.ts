@@ -20,3 +20,8 @@ export function formatScore(n: number): string {
   // that is followed by a whole number of three-digit groups.
   return String(Math.round(n)).replace(/\B(?=(\d{3})+$)/g, NBSP);
 }
+
+/** A score with its unit, for the player screens: 1 → '1 бал', 1730 → '1 730 балів'. */
+export function formatPoints(n: number): string {
+  return `${formatScore(n)} ${plural(n, ['бал', 'бали', 'балів'])}`;
+}

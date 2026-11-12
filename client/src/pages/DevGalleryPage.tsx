@@ -3,18 +3,32 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { Notice } from '../components/ui/Notice';
 import { hostFixtures, playerFixtures } from '../fixtures/states';
 import { HostPreview } from './dev/HostPreview';
+import { PlayerPreview } from './dev/PlayerPreview';
 import { UiKitShowcase } from './dev/UiKitShowcase';
 import styles from './DevGalleryPage.module.css';
+
+// Not a fixture of its own: the `question-4` snapshot after the time has run out.
+const LOCKED_KEY = 'question-4-locked';
 
 // Screen id in the address is `<group>/<key>`: the host and the player have fixtures with equal keys.
 const GROUPS = [
   { id: 'ui', title: 'UI-кіт', keys: ['kit'] },
   { id: 'host', title: 'Ведучий', keys: Object.keys(hostFixtures) },
-  { id: 'player', title: 'Гравець', keys: Object.keys(playerFixtures) },
+  {
+    id: 'player',
+    title: 'Гравець',
+    keys: Object.keys(playerFixtures).flatMap((key) => (key === 'question-4' ? [key, LOCKED_KEY] : [key])),
+  },
 ];
 
 // Host screens are made for a projector: they are previewed in a 16:9 frame of this size.
 const STAGE_FRAME = { width: 1280, height: 720 };
+// Player screens are previewed in the frame of a small, a usual and a large phone.
+const PHONE_FRAMES = [
+  { width: 360, height: 640 },
+  { width: 390, height: 844 },
+  { width: 430, height: 932 },
+];
 
 /**
  * Development-only gallery: every screen in every state, drawn from fixtures without a server.
@@ -24,6 +38,9 @@ export function DevGalleryPage() {
   const [params] = useSearchParams();
   const screen = params.get('screen') ?? 'ui/kit';
   const view = params.get('view');
+  const [phoneFrame, setPhoneFrame] = useState(PHONE_FRAMES[1]);
+  const isPlayer = screen.startsWith('player/');
+  const frame = isPlayer ? phoneFrame : STAGE_FRAME;
 
   // The bare screen: `view=full` is the "full screen" switch, `view=frame` is what a frame loads.
   if (view !== null) {
@@ -45,6 +62,20 @@ export function DevGalleryPage() {
         <Link className={styles.fullLink} to={`/dev?screen=${screen}&view=full`}>
           На весь екран
         </Link>
+        {isPlayer && (
+          <div className={styles.sizes} role="group" aria-label="Розмір рамки телефона">
+            {PHONE_FRAMES.map((size) => (
+              <button
+                key={size.width}
+                type="button"
+                className={size === phoneFrame ? `${styles.size} ${styles.active}` : styles.size}
+                onClick={() => setPhoneFrame(size)}
+              >
+                {size.width}×{size.height}
+              </button>
+            ))}
+          </div>
+        )}
         {GROUPS.map((group) => (
           <section key={group.id}>
             <h2 className={styles.groupTitle}>{group.title}</h2>
@@ -72,7 +103,7 @@ export function DevGalleryPage() {
         {screen.startsWith('ui/') ? (
           <GalleryScreen id={screen} />
         ) : (
-          <Frame src={`/dev?screen=${screen}&view=frame`} width={STAGE_FRAME.width} height={STAGE_FRAME.height} />
+          <Frame src={`/dev?screen=${screen}&view=frame`} width={frame.width} height={frame.height} />
         )}
       </div>
     </div>
@@ -87,6 +118,12 @@ function GalleryScreen({ id }: { id: string }) {
   if (group === 'host' && Object.hasOwn(hostFixtures, key)) {
     // The key remounts the preview for every fixture, so each one starts its own timer.
     return <HostPreview key={key} fixture={hostFixtures[key]} />;
+  }
+  if (group === 'player' && key === LOCKED_KEY) {
+    return <PlayerPreview key={key} fixture={playerFixtures['question-4']} locked />;
+  }
+  if (group === 'player' && Object.hasOwn(playerFixtures, key)) {
+    return <PlayerPreview key={key} fixture={playerFixtures[key]} />;
   }
   return (
     <div className={styles.unknown}>

@@ -6,6 +6,7 @@ import { HostLeaderboard } from '../../screens/host/HostLeaderboard';
 import { HostLobby } from '../../screens/host/HostLobby';
 import { HostQuestion } from '../../screens/host/HostQuestion';
 import { HostReveal } from '../../screens/host/HostReveal';
+import { startTimer } from './startTimer';
 
 type HostPreviewProps = { fixture: HostState };
 
@@ -37,11 +38,4 @@ export function HostPreview({ fixture }: HostPreviewProps) {
     case 'finished':
       return <HostFinished {...common} onExit={() => console.info('[dev] onExit')} />;
   }
-}
-
-/** For the `question` phase: sets the snapshot time to "now" and the deadline one time limit ahead. */
-function startTimer(state: HostState): HostState {
-  if (state.phase !== 'question' || state.question === null) return state;
-  const now = Date.now();
-  return { ...state, serverNow: now, endsAt: now + state.question.timeLimitSec * 1000 };
 }

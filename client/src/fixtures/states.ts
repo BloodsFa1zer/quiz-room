@@ -1,4 +1,11 @@
-import type { HostState, LeaderboardEntry, PlayerInfo, PlayerState, QuestionPublic } from '@quiz/shared';
+import {
+  LEADERBOARD_SIZE,
+  type HostState,
+  type LeaderboardEntry,
+  type PlayerInfo,
+  type PlayerState,
+  type QuestionPublic,
+} from '@quiz/shared';
 
 // Ready-made snapshots for the /dev gallery: one per screen state, shaped exactly like the server
 // sends them (phase table in docs/00-common.md §6.3). `states.test.ts` checks every one of them.
@@ -52,7 +59,7 @@ const GAME: Row[] = [
   ['Назар', 560, 0],
   ['Іванка', 0, 980],
   ['Остап', 720, 0],
-  ['Олександра-Марія', 880, 830],
+  ['Олександра-Марія', 880, 850],
   ['Максим', 0, 0],
   ['Юля', 600, 0],
   ['Роман', 950, 560],
@@ -183,5 +190,44 @@ export const hostFixtures: Record<string, HostState> = {
   ]),
 };
 
-/** Player snapshots are added in stage B3. */
-export const playerFixtures: Record<string, PlayerState> = {};
+/**
+ * The snapshot one player of `room` gets. The server builds it from the same room as the host
+ * snapshot, so here `me`, `top` and `lastResult` are taken from the room's leaderboard too.
+ * `myAnswer` is not part of the host snapshot, so the fixture names it.
+ */
+function seenBy(room: HostState, name: string, myAnswer: number | null = null): PlayerState {
+  const { players, answeredCount, answerCounts, leaderboard, ...common } = room;
+  const entry = leaderboard.find((row) => row.name === name);
+  if (entry === undefined) throw new Error(`Fixture: no player "${name}" in the room`);
+  const isRevealed = room.phase === 'reveal' || room.phase === 'leaderboard';
+
+  return {
+    ...common,
+    me: { id: entry.playerId, name, score: entry.score, rank: entry.rank },
+    playerCount: players.length,
+    myAnswer,
+    lastResult: isRevealed ? { correct: myAnswer === room.correctIndex, points: entry.lastPoints } : null,
+    top: leaderboard.slice(0, LEADERBOARD_SIZE),
+  };
+}
+
+// The host `leaderboard` fixture has 12 players; the 14th place needs the whole 20-player game.
+const LEADERBOARD_ALL = revealed('leaderboard', AFTER_REVEAL, [3, 9, 2, 6]);
+
+/** The same games as on the host screens, seen by one of their players. Q4: the correct option is B. */
+export const playerFixtures: Record<string, PlayerState> = {
+  lobby: seenBy(hostFixtures['lobby-few'], 'Марічка'),
+  // The longest name the contract allows, so the header is checked at its widest.
+  'question-4': seenBy(hostFixtures['question-4'], 'Олександра-Марія'),
+  'question-2': seenBy(hostFixtures['question-2'], 'Олександра-Марія'),
+  'question-3': seenBy(hostFixtures['question-3'], 'Олександра-Марія'),
+  'question-long': seenBy(hostFixtures['question-long'], 'Олександра-Марія'),
+  answered: seenBy(hostFixtures['question-4'], 'Марічка', 2),
+  'reveal-correct': seenBy(hostFixtures['reveal-4'], 'Олександра-Марія', 1),
+  'reveal-wrong': seenBy(hostFixtures['reveal-4'], 'Марічка', 2),
+  'reveal-timeout': seenBy(hostFixtures['reveal-none'], 'Марічка'),
+  'leaderboard-top': seenBy(LEADERBOARD_ALL, 'Оля', 1),
+  'leaderboard-low': seenBy(LEADERBOARD_ALL, 'Леся', 0),
+  'finished-winner': seenBy(hostFixtures['finished-many'], 'Андрій'),
+  'finished-low': seenBy(hostFixtures['finished-many'], 'Назар'),
+};

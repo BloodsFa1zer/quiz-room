@@ -51,8 +51,9 @@
   font-size: 1.125rem;
 }
 
+/* 14px: at 15px an 80-character option needs four lines on a 360px phone and loses its end. */
 .phone.long {
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
 }
 
 /* Parts */
