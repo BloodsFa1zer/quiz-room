@@ -1,0 +1,20 @@
+/* The "game is over" card sits in the middle of the screen. */
+.message {
+  margin: auto 0;
+  text-align: center;
+}
+
+.title {
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+.connecting {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin: auto 0;
+  color: var(--text-muted);
+  font-size: 1.25rem;
+}
