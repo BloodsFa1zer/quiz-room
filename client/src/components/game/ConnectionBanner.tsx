@@ -1,0 +1,32 @@
+import { useEffect, useState } from 'react';
+import styles from './ConnectionBanner.module.css';
+
+type ConnectionBannerProps = {
+  /** Whether the socket is connected right now; the page takes it from `useConnection()`. */
+  connected: boolean;
+};
+
+// A short wait: the very first connection and quick reconnects should not make the banner flash.
+const SHOW_AFTER_MS = 1000;
+
+/** Strip on top of the page while the connection to the server is lost. */
+export function ConnectionBanner({ connected }: ConnectionBannerProps) {
+  const [waitedEnough, setWaitedEnough] = useState(false);
+
+  useEffect(() => {
+    if (connected) return;
+    const id = setTimeout(() => setWaitedEnough(true), SHOW_AFTER_MS);
+    return () => {
+      clearTimeout(id);
+      setWaitedEnough(false);
+    };
+  }, [connected]);
+
+  if (connected || !waitedEnough) return null;
+
+  return (
+    <div className={styles.banner} role="alert">
+      Зʼєднання втрачено. Перепідключаємось…
+    </div>
+  );
+}

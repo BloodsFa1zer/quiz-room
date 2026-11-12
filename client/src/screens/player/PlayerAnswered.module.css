@@ -1,0 +1,24 @@
+/* Takes the free height and keeps the chosen option in the middle of the screen. */
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-5);
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.waiting {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  color: var(--text-muted);
+  font-size: 1.125rem;
+  font-weight: 700;
+}

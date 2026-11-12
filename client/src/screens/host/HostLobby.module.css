@@ -1,0 +1,32 @@
+/* Two columns under the header: the QR code on the left, the code and the players on the right. */
+.body {
+  display: flex;
+  flex: 1;
+  gap: clamp(16px, 3.5vw, 64px);
+  min-height: 0;
+}
+
+/* The QR code is as big as the window allows in both directions. */
+.qr {
+  flex: none;
+  width: clamp(180px, min(24vw, 42dvh), 420px);
+}
+
+.side {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.5em;
+  min-width: 0;
+  min-height: 0;
+}
+
+.label {
+  color: var(--text-muted);
+  font-size: 1.1em;
+  font-weight: 700;
+}
+
+.waiting {
+  font-size: 1.3em;
+}

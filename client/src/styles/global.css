@@ -1,0 +1,57 @@
+:root {
+  /* Native controls and scrollbars follow the dark theme. */
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  /* dvh, not vh: on phones the browser toolbar would otherwise cover the bottom of the page. */
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  line-height: 1.4;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--accent);
+}
+
+input,
+textarea,
+select,
+button {
+  font: inherit;
+}
+
+/* iOS zooms the page when a focused field has a font smaller than 16px. */
+input,
+textarea,
+select {
+  font-size: max(16px, 1em);
+}
+
+button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px solid var(--warning);
+  outline-offset: 2px;
+}

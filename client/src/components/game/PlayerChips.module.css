@@ -1,0 +1,28 @@
+.chips {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 0.4em;
+  /* Takes the free height of the parent and scrolls inside itself when the names do not fit. */
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.chip {
+  max-width: 100%;
+  padding: 0.25em 0.8em;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-l);
+  background: var(--surface-2);
+  font-size: 0.8em;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.offline {
+  opacity: 0.4;
+}

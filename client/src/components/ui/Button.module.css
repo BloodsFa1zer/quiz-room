@@ -1,0 +1,70 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 2px solid transparent;
+  border-radius: var(--radius-m);
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    filter 0.15s,
+    transform 0.05s;
+}
+
+/* Only for real pointers: on touch screens :hover sticks after a tap. */
+@media (hover: hover) {
+  .button:hover:not(:disabled) {
+    filter: brightness(1.15);
+  }
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Sizes. `l` is the phone size: at least 56px tall, easy to hit with a thumb. */
+.m {
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  font-size: 1rem;
+}
+
+.l {
+  min-height: 56px;
+  padding: var(--space-3) var(--space-5);
+  font-size: 1.25rem;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+/* Variants */
+.primary {
+  background: var(--accent-strong);
+  color: var(--text);
+}
+
+.secondary {
+  background: var(--surface-2);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--accent);
+}
+
+/* Dark text: light text on the bright danger colour is hard to read. */
+.danger {
+  background: var(--danger);
+  color: var(--bg);
+}

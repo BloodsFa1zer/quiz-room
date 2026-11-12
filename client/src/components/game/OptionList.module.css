@@ -1,0 +1,23 @@
+.list {
+  display: grid;
+  /* Rows share the height of the parent equally; minmax(0, …) lets them shrink below their content. */
+  grid-auto-rows: minmax(0, 1fr);
+  height: 100%;
+}
+
+/* stage: 2×2 grid. Two options make one row. */
+.stage {
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(8px, 1.2vw, 20px);
+}
+
+/* Three options: the third one takes the whole second row. */
+.stage > :nth-child(3):last-child {
+  grid-column: 1 / -1;
+}
+
+/* phone: one column. */
+.phone {
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+}

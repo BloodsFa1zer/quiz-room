@@ -1,0 +1,38 @@
+.counter {
+  flex: none;
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.question {
+  /* Cut after four lines: whatever the text, the buttons stay on the screen. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  flex: none;
+  overflow: hidden;
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.long {
+  font-size: 1.0625rem;
+}
+
+/* The same height as the timer it replaces, so the buttons do not jump when the time runs out. */
+.timeUp {
+  flex: none;
+  color: var(--warning);
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.3;
+  text-align: center;
+}
+
+/* The buttons take all the height that is left. */
+.options {
+  flex: 1;
+  min-height: 0;
+}

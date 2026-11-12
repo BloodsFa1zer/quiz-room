@@ -1,0 +1,117 @@
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.number {
+  font-size: 1.25rem;
+}
+
+.tools {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Text area, option fields and the select share one look with TextInput from the UI kit. */
+.control {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-m);
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+textarea.control {
+  resize: vertical;
+}
+
+.select {
+  width: auto;
+  min-width: 200px;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.options legend {
+  margin-bottom: var(--space-2);
+  padding: 0;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.option .control {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Coloured letter, the same colours as the answer tiles in the game. */
+.letter {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-s);
+  color: var(--text);
+  font-weight: 800;
+}
+
+.opt0 {
+  background: var(--opt-0);
+}
+
+.opt1 {
+  background: var(--opt-1);
+}
+
+.opt2 {
+  background: var(--opt-2);
+}
+
+.opt3 {
+  background: var(--opt-3);
+}
+
+.correct {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.correct input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--success);
+}

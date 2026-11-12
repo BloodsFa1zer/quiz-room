@@ -1,22 +1,25 @@
-import { useEffect, useState } from 'react';
-import { DEFAULT_TIME_LIMIT_SEC } from '@quiz/shared';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { DevGalleryPage } from './pages/DevGalleryPage';
+import { HostGamePage } from './pages/HostGamePage';
+import { JoinPage } from './pages/JoinPage';
+import { NotFoundPage } from './pages/NotFoundPage';
+import { PlayerGamePage } from './pages/PlayerGamePage';
+import { QuizEditorPage } from './pages/QuizEditorPage';
+import { QuizListPage } from './pages/QuizListPage';
 
-/** Stage 0 stub: proves that the Vite proxy and the shared package work. Replaced in stage B1. */
 export function App() {
-  const [health, setHealth] = useState('перевіряю…');
-
-  useEffect(() => {
-    fetch('/api/health')
-      .then((res) => res.json())
-      .then((body: { ok: boolean }) => setHealth(body.ok ? 'сервер на звʼязку ✅' : 'помилка ❌'))
-      .catch(() => setHealth('сервер недоступний ❌'));
-  }, []);
-
   return (
-    <main style={{ fontFamily: 'system-ui', padding: 24 }}>
-      <h1>QuizRoom</h1>
-      <p>API: {health}</p>
-      <p>Контракт підключено: час на питання за замовчуванням — {DEFAULT_TIME_LIMIT_SEC} с</p>
-    </main>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<JoinPage />} />
+        <Route path="/play/:pin" element={<PlayerGamePage />} />
+        <Route path="/quizzes" element={<QuizListPage />} />
+        <Route path="/quizzes/new" element={<QuizEditorPage />} />
+        <Route path="/quizzes/:quizId" element={<QuizEditorPage />} />
+        <Route path="/host/:pin" element={<HostGamePage />} />
+        <Route path="/dev" element={<DevGalleryPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }

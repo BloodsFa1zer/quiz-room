@@ -1,0 +1,63 @@
+.screen {
+  width: 100%;
+  margin: 0 auto;
+  /* A long name or title wraps instead of pushing the page wider than the screen. */
+  overflow-wrap: anywhere;
+}
+
+/* phone: one column up to 480px that fills the visible part of the screen; children take the full width. */
+.phone {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 480px;
+  min-height: 100dvh;
+  padding: var(--space-5) var(--space-4);
+  /* Keeps the last button above the home indicator on phones without a physical button. */
+  padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom));
+  animation: screen-in 0.2s ease-out;
+}
+
+/* With `min-height` alone the height is not definite, and a child's `height: 100%` would be ignored. */
+.fit {
+  height: 100dvh;
+}
+
+/* stage: exactly one projector screen, never scrolls; the font grows with the window width. */
+.stage {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2vw, 32px);
+  height: 100dvh;
+  padding: clamp(16px, 3vw, 48px);
+  overflow: hidden;
+  font-size: clamp(18px, 1.8vw, 32px);
+  animation: screen-in 0.2s ease-out;
+}
+
+/* page: an ordinary laptop page up to 880px wide, vertical scroll is allowed. */
+.page {
+  max-width: 880px;
+  min-height: 100dvh;
+  padding: var(--space-6) var(--space-4);
+}
+
+/*
+ * A game screen fades in when it appears, i.e. on every change of the phase: each phase is a different
+ * screen component, so React mounts a new <main>. A slight zoom-in (not a shift) never makes the page
+ * scrollable for a moment. `page` is not animated: a transform would detach the editor's fixed bar
+ * from the window while it runs.
+ */
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phone,
+  .stage {
+    animation: none;
+  }
+}

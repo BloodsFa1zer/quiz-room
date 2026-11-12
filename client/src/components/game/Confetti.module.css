@@ -1,0 +1,51 @@
+/*
+ * Behind the content (negative z-index) and transparent to clicks: the pieces fall over the empty
+ * background only and never cover the buttons, the podium or the table.
+ */
+.confetti {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Starts above the top edge; after the last fall it returns there, out of sight. */
+.piece {
+  position: absolute;
+  top: -5%;
+  width: clamp(8px, 0.8vw, 16px);
+  height: clamp(14px, 1.4vw, 28px);
+  border-radius: 2px;
+  background: var(--accent);
+  animation: fall 4s linear 3 backwards;
+}
+
+.piece:nth-child(5n + 1) {
+  background: var(--opt-0);
+}
+
+.piece:nth-child(5n + 2) {
+  background: var(--opt-1);
+}
+
+.piece:nth-child(5n + 3) {
+  background: var(--opt-2);
+}
+
+.piece:nth-child(5n + 4) {
+  background: var(--warning);
+}
+
+/* Each piece falls three times (about 12 s in all) and then the final table stays calm. */
+@keyframes fall {
+  to {
+    transform: translateY(110dvh) rotate(720deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti {
+    display: none;
+  }
+}

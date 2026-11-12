@@ -1,0 +1,39 @@
+.logo {
+  flex: none;
+  text-align: center;
+}
+
+/* Takes the free height and keeps the greeting in the middle of the screen. */
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.title {
+  color: var(--success);
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.name {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.hint {
+  color: var(--text-muted);
+  font-size: 1.125rem;
+  text-wrap: balance;
+}
+
+.count {
+  flex: none;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-align: center;
+}

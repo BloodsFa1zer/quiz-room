@@ -1,0 +1,129 @@
+.tile {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  width: 100%;
+  /* Lets the tile shrink inside a grid cell instead of pushing the layout apart. */
+  min-width: 0;
+  min-height: 0;
+  padding: 0.45em 0.7em;
+  overflow: hidden;
+  /* The border is always there, so highlighting a tile does not move its content. */
+  border: 4px solid transparent;
+  border-radius: var(--radius-m);
+  background: var(--tile-color);
+  color: var(--text);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: left;
+}
+
+/* Colour by option index. */
+.opt0 {
+  --tile-color: var(--opt-0);
+}
+
+.opt1 {
+  --tile-color: var(--opt-1);
+}
+
+.opt2 {
+  --tile-color: var(--opt-2);
+}
+
+.opt3 {
+  --tile-color: var(--opt-3);
+}
+
+/* Sizes */
+.stage {
+  font-size: clamp(20px, 2.4vw, 40px);
+}
+
+.stage.long {
+  font-size: clamp(16px, 1.9vw, 32px);
+}
+
+/* phone: at least 56px to tap; little vertical padding, so three lines of a long option fit a low tile. */
+.phone {
+  min-height: 56px;
+  padding: var(--space-1) var(--space-3);
+  font-size: 1.125rem;
+}
+
+/* 14px: at 15px an 80-character option needs four lines on a 360px phone and loses its end. */
+.phone.long {
+  font-size: 0.875rem;
+}
+
+/* Parts */
+.letter {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.6em;
+  height: 1.6em;
+  border-radius: var(--radius-s);
+  background: var(--text);
+  color: var(--tile-color);
+  font-weight: 800;
+}
+
+.text {
+  /* The standard way to cut a text after N lines with an ellipsis. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.count {
+  flex: none;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 50%;
+  color: var(--bg);
+  font-weight: 800;
+}
+
+/* States */
+.selected {
+  border-color: var(--text);
+}
+
+.correct {
+  border-color: var(--success);
+}
+
+.correct .mark {
+  background: var(--success);
+}
+
+.wrong .mark {
+  background: var(--danger);
+}
+
+.dimmed {
+  opacity: 0.45;
+}
+
+/* Tile as a button */
+button.tile {
+  cursor: pointer;
+}
+
+button.tile:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

@@ -1,0 +1,24 @@
+.header {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+}
+
+/* A long quiz title takes at most two lines and never pushes the button away. */
+.title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 1.5em;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.action {
+  flex: none;
+  white-space: nowrap;
+}
