@@ -20,6 +20,8 @@
   border-radius: var(--radius-m);
   background: var(--surface);
   line-height: 1.3;
+  /* `backwards`: a row waiting for its turn (inline animation-delay) is already invisible. */
+  animation: row-in 0.25s ease-out backwards;
 }
 
 .highlight {
@@ -59,4 +61,18 @@
   font-weight: 800;
   text-align: right;
   font-variant-numeric: tabular-nums;
+}
+
+/* From the left, not from below: a shift to the left never makes the list scrollable for a moment. */
+@keyframes row-in {
+  from {
+    opacity: 0;
+    transform: translateX(-1.5em);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row {
+    animation: none;
+  }
 }
