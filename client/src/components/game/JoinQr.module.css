@@ -25,3 +25,7 @@
   text-align: center;
   overflow-wrap: anywhere;
 }
+
+.copy {
+  align-self: center;
+}
