@@ -41,7 +41,9 @@ textarea.control {
   resize: vertical;
 }
 
+/* The field is a flex column that stretches its children; the select keeps its own width. */
 .select {
+  align-self: flex-start;
   width: auto;
   min-width: 200px;
 }
