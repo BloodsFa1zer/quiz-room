@@ -44,9 +44,14 @@ export function PlayerReveal({ state }: PlayerScreenProps) {
           {icon}
         </span>
         <h1 className={styles.title}>{title}</h1>
-        {lastResult.correct ? (
-          <p className={styles.points}>+{formatScore(lastResult.points)}</p>
-        ) : (
+        {lastResult.correct && <p className={styles.points}>+{formatScore(lastResult.points)}</p>}
+        {/* A wrong answer: the player sees what they chose next to what was right. */}
+        {outcome === 'wrong' && state.myAnswer !== null && (
+          <p className={`${styles.answer} ${styles.mine}`}>
+            Твоя відповідь: <strong>{question.options[state.myAnswer]}</strong>
+          </p>
+        )}
+        {!lastResult.correct && (
           <p className={styles.answer}>
             Правильна відповідь: <strong>{question.options[correctIndex]}</strong>
           </p>
