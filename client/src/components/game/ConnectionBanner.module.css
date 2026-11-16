@@ -1,16 +1,42 @@
-/* Lies over the top of the page, so the screen under it does not jump when it appears. */
-.banner {
+/*
+ * Dims the whole page and puts the card in its middle. Clicks go through (`pointer-events: none`):
+ * while offline the game ignores taps anyway, and on the join page the fields stay usable.
+ */
+.overlay {
   position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
+  inset: 0;
   z-index: 10;
-  padding: var(--space-3) var(--space-4);
-  /* Keeps the text below the notch on phones. */
-  padding-top: calc(var(--space-3) + env(safe-area-inset-top));
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: var(--backdrop);
+  /* Readable on a phone and from the back row of a room in front of the projector. */
+  font-size: clamp(18px, 2.2vw, 40px);
+  pointer-events: none;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4em;
+  max-width: 20em;
+  padding: 1em 1.5em;
+  border-radius: var(--radius-l);
   background: var(--warning);
   color: var(--bg);
-  font-weight: 700;
   text-align: center;
   box-shadow: var(--shadow);
+}
+
+/* The spinner is 1em: a bigger font makes it bigger. */
+.spinner {
+  display: flex;
+  font-size: 1.5em;
+}
+
+.title {
+  font-size: 1.3em;
+  font-weight: 800;
+  line-height: 1.2;
 }
