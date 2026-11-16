@@ -39,8 +39,11 @@ export function JoinQr({ url }: JoinQrProps) {
         {/* The pad around the code is its quiet zone, so the code itself is drawn without a margin. */}
         <QRCodeSVG className={styles.code} value={url} level="M" marginSize={0} />
       </div>
-      {/* The scheme is dropped: it only makes the address longer to type. */}
-      <p className={styles.url}>{url.replace(/^\w+:\/\//, '')}</p>
+      {/*
+        Only the host and port, e.g. 192.168.1.7:5173: the game code is next to it in huge digits,
+        so `?pin=…` would just make the address long, small and broken over two lines.
+      */}
+      <p className={styles.url}>{new URL(url).host}</p>
       {canCopy && (
         <Button variant="ghost" className={styles.copy} onClick={copy}>
           {COPY_LABELS[status]}
