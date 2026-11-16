@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type MouseEvent } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '../ui/Button';
 import styles from './JoinQr.module.css';
@@ -25,7 +25,10 @@ export function JoinQr({ url }: JoinQrProps) {
   // The clipboard API exists only in a secure context: on localhost, but not on a plain-HTTP LAN address.
   const canCopy = navigator.clipboard !== undefined;
 
-  function copy() {
+  function copy(event: MouseEvent<HTMLButtonElement>) {
+    // A clicked button keeps the focus, and then the host's Space would copy once more
+    // instead of starting the game (a focused button handles Space itself).
+    event.currentTarget.blur();
     navigator.clipboard.writeText(url).then(
       () => setStatus('copied'),
       () => setStatus('failed'),
