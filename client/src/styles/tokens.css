@@ -19,6 +19,8 @@
 
   /* Pad under the QR code: stays white on the dark theme, otherwise phone cameras cannot read it. */
   --qr-bg: #ffffff;
+  /* --bg at 70%: dims the screen under the "connection lost" card but leaves it recognisable. */
+  --backdrop: rgb(18 16 42 / 0.7);
 
   --radius-s: 8px;
   --radius-m: 14px;

@@ -41,7 +41,9 @@ textarea.control {
   resize: vertical;
 }
 
+/* The field is a flex column that stretches its children; the select keeps its own width. */
 .select {
+  align-self: flex-start;
   width: auto;
   min-width: 200px;
 }
@@ -114,4 +116,14 @@ textarea.control {
   height: 20px;
   margin: 0;
   accent-color: var(--success);
+}
+
+/* The correct option stands out in green, not only by its small radio button. */
+.isCorrect .control {
+  border-color: var(--success);
+}
+
+.isCorrect .correct {
+  color: var(--success);
+  font-weight: 700;
 }

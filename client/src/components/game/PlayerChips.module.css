@@ -18,7 +18,6 @@
   border: 2px solid var(--border);
   border-radius: var(--radius-l);
   background: var(--surface-2);
-  font-size: 0.8em;
   font-weight: 700;
   overflow-wrap: anywhere;
 }

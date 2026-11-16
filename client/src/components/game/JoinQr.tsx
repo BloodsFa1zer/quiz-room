@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type MouseEvent } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '../ui/Button';
 import styles from './JoinQr.module.css';
@@ -25,7 +25,10 @@ export function JoinQr({ url }: JoinQrProps) {
   // The clipboard API exists only in a secure context: on localhost, but not on a plain-HTTP LAN address.
   const canCopy = navigator.clipboard !== undefined;
 
-  function copy() {
+  function copy(event: MouseEvent<HTMLButtonElement>) {
+    // A clicked button keeps the focus, and then the host's Space would copy once more
+    // instead of starting the game (a focused button handles Space itself).
+    event.currentTarget.blur();
     navigator.clipboard.writeText(url).then(
       () => setStatus('copied'),
       () => setStatus('failed'),
@@ -39,8 +42,11 @@ export function JoinQr({ url }: JoinQrProps) {
         {/* The pad around the code is its quiet zone, so the code itself is drawn without a margin. */}
         <QRCodeSVG className={styles.code} value={url} level="M" marginSize={0} />
       </div>
-      {/* The scheme is dropped: it only makes the address longer to type. */}
-      <p className={styles.url}>{url.replace(/^\w+:\/\//, '')}</p>
+      {/*
+        Only the host and port, e.g. 192.168.1.7:5173: the game code is next to it in huge digits,
+        so `?pin=…` would just make the address long, small and broken over two lines.
+      */}
+      <p className={styles.url}>{new URL(url).host}</p>
       {canCopy && (
         <Button variant="ghost" className={styles.copy} onClick={copy}>
           {COPY_LABELS[status]}

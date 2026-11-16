@@ -30,7 +30,9 @@ export function HostQuestion({ state, clockOffset, onNext, busy }: HostScreenPro
         {question.text}
       </h2>
 
-      <TimerBar fraction={fraction} secondsLeft={secondsLeft} />
+      <div className={styles.timer}>
+        <TimerBar fraction={fraction} secondsLeft={secondsLeft} />
+      </div>
 
       <div className={styles.options}>
         <OptionList options={question.options} size="stage" />

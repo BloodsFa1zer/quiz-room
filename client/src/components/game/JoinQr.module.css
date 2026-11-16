@@ -18,8 +18,9 @@
   height: auto;
 }
 
+/* Big enough to read from the back row; even 192.168.100.123:5173 still fits the QR width in one line. */
 .url {
-  font-size: 0.85em;
+  font-size: 1.2em;
   font-weight: 700;
   line-height: 1.2;
   text-align: center;
