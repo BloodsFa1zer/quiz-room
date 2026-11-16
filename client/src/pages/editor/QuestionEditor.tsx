@@ -74,7 +74,7 @@ export function QuestionEditor({
         <legend className={styles.label}>Варіанти відповіді</legend>
         {options.map((option, i) => (
           // Options have no ids of their own; their position is what the quiz stores.
-          <div key={i} className={styles.option}>
+          <div key={i} className={i === correctIndex ? `${styles.option} ${styles.isCorrect}` : styles.option}>
             <span className={`${styles.letter} ${styles[`opt${i}`]}`}>{OPTION_LETTERS[i]}</span>
             <input
               className={styles.control}

@@ -117,3 +117,13 @@ textarea.control {
   margin: 0;
   accent-color: var(--success);
 }
+
+/* The correct option stands out in green, not only by its small radio button. */
+.isCorrect .control {
+  border-color: var(--success);
+}
+
+.isCorrect .correct {
+  color: var(--success);
+  font-weight: 700;
+}
