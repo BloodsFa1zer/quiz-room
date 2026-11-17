@@ -338,7 +338,7 @@ npm run dev:client      # /dev → група «Гравець», три роз�
 
 **Мета:** ведучий може переглянути, створити, відредагувати й видалити квіз через інтерфейс.
 
-**Залежить від:** B3 і **A1** (точка синхронізації SP1). Перевірка A1: при запущеному `npm run dev` команда `curl -s localhost:5173/api/quizzes` повертає JSON-масив із двома демо-квізами. Якщо ні — зупинись і повідом людину.
+**Залежить від:** B3 і **A1** (точка синхронізації SP1). Перевірка A1: при запущеному `npm run dev` команда `curl -s localhost:5173/api/quizzes` повертає JSON-масив із двома демо-квізами. Якщо ні — зупинись і повідом кодера A.
 
 **Файли:** створити `lib/quizDraft.ts`, `lib/quizDraft.test.ts`; переписати `pages/QuizListPage.tsx`, `pages/QuizEditorPage.tsx`; за потреби додати компоненти в `components/ui/`.
 
@@ -414,7 +414,7 @@ curl -s localhost:3001/api/quizzes     # звірити зі списком на
 
 **Мета:** повна гра в браузері проти справжнього сервера: ведучий запускає квіз, гравці входять і грають, усе переживає оновлення сторінки й обрив звʼязку.
 
-**Залежить від:** B4 і **A3** (точка синхронізації SP2); бажано A4 (боти). Перевірка A3: у `main` є `server/src/game/engine.ts` з функцією `advance`, і `npm run smoke` друкує `SMOKE OK`. Якщо ні — зупинись і повідом людину.
+**Залежить від:** B4 і **A3** (точка синхронізації SP2); бажано A4 (боти). Перевірка A3: у `main` є `server/src/game/engine.ts` з функцією `advance`, і `npm run smoke` друкує `SMOKE OK`. Якщо ні — зупинись і повідом кодера A.
 
 **Файли:** створити `hooks/useHostRoom.ts`, `hooks/usePlayerRoom.ts`, `components/game/ConnectionBanner.tsx`; переписати `pages/JoinPage.tsx`, `pages/HostGamePage.tsx`, `pages/PlayerGamePage.tsx`; змінити `pages/QuizListPage.tsx`.
 
